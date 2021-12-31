@@ -1,32 +1,46 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 const Father = styled.div`
   display: flex;
 `;
 
-const Btn = styled.button`
-  background-color: skyblue;
-  border: none;
-  border-radius: 15px;
-  padding: 10px;
-  color: white;
+const rotationAnimation = keyframes`
+  0% {
+    transform: rotate(0deg);
+    border-radius: 0px;
+  } 
+  50% {
+    transform: rotate(360deg);
+    border-radius: 50%;
+  }
+  100% {
+    transform: rotate(0deg);
+    border-radius: 0px;
+  }
 `;
 
-const Input = styled.input.attrs({ required: true, placeholder: "attrs" })`
-  background-color: whitesmoke;
+const Box = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: skyblue;
+  width: 100px;
+  height: 100px;
+  animation: ${rotationAnimation} 3s linear infinite;
+  span {
+    font-size: 30px;
+    &:hover {
+      font-size: 70px;
+    }
+  }
 `;
 
 function App() {
   return (
     <Father>
-      <Btn>Click</Btn>
-      <Btn as="a" href="/">
-        Click
-      </Btn>
-      <Input />
-      <Input />
-      <Input />
-      <Input />
+      <Box>
+        <span>💯</span>
+      </Box>
     </Father>
   );
 }
