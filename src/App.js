@@ -19,6 +19,10 @@ const rotationAnimation = keyframes`
   }
 `;
 
+const Emoji = styled.span`
+  font-size: 30px;
+`;
+
 const Box = styled.div`
   display: flex;
   justify-content: center;
@@ -27,8 +31,7 @@ const Box = styled.div`
   width: 100px;
   height: 100px;
   animation: ${rotationAnimation} 3s linear infinite;
-  span {
-    font-size: 30px;
+  ${Emoji} {
     &:hover {
       font-size: 70px;
     }
@@ -39,8 +42,9 @@ function App() {
   return (
     <Father>
       <Box>
-        <span>💯</span>
+        <Emoji>💯</Emoji>
       </Box>
+      <Emoji>♻</Emoji>
     </Father>
   );
 }
