@@ -1,20 +1,8 @@
-import styled from "styled-components";
-
-const Container = styled.div`
-  background-color: ${props=>props.theme.bgColor};
-`;
-
-const H1 = styled.h1`
-  color: ${props => props.theme.textColor};
-`;
+import Router from "./routers/Router";
 
 function App() {
   return (
-    <div>
-      <Container>
-        <H1>Theme Practice</H1>
-      </Container>
-    </div>
+    <Router></Router>
   );
 }
 
