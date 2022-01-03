@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router";
+import { useLocation, useParams, useRouteMatch } from "react-router";
 import styled from "styled-components";
+import { Switch, Route, Link } from "react-router-dom";
+import Chart from "./Chart";
+import Price from "./Price";
 
 const Container = styled.div`
   padding: 0 20px;
@@ -23,6 +26,42 @@ const Title = styled.h1`
 const Loader = styled.span`
   text-align: center;
   display: block;
+`;
+
+const Section = styled.section`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: black;
+  padding: 15px 0;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  span {
+    font-size: 20px;
+    font-weight: 600;
+  }
+`;
+
+const Tabs = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  background-color: gray;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+`;
+
+const Tab = styled.div<{ isActive: boolean }>`
+  a {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  padding: 12px 0;
+  color: ${(props) =>
+    props.isActive ? props.theme.accentColor : props.theme.textColor};
+  text-transform: uppercase;
+  border-bottom: ${(props) =>
+    props.isActive ? `5px solid ${props.theme.accentColor}` : "none"};
 `;
 
 interface coinIdProps {
@@ -94,6 +133,8 @@ function Coin() {
   const { state } = useLocation<RouteState>();
   const [info, setInfo] = useState<InfoData>();
   const [price, setPrice] = useState<priceData>();
+  const priceMatch = useRouteMatch("/:coinId/price");
+  const chartMatch = useRouteMatch("/:coinId/chart");
   useEffect(() => {
     (async () => {
       const infoData = await (
@@ -102,10 +143,9 @@ function Coin() {
       const priceDate = await (
         await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
       ).json();
-      console.log(infoData);
-      console.log(priceDate);
       setInfo(infoData);
       setPrice(priceDate);
+      setLoading(false);
     })();
   }, []);
   return (
@@ -114,6 +154,27 @@ function Coin() {
         <Title>{state?.name || "Loading..."}</Title>
       </Header>
       {loading ? <Loader>Loading...</Loader> : null}
+
+      <Section>
+        <span>Price Information</span>
+      </Section>
+      <Tabs>
+        <Tab isActive={priceMatch !== null}>
+          <Link to={`/${coinId}/price`}>Price</Link>
+        </Tab>
+        <Tab isActive={chartMatch !== null}>
+          <Link to={`/${coinId}/chart`}>Chart</Link>
+        </Tab>
+      </Tabs>
+
+      <Switch>
+        <Route path={`/${coinId}/price`}>
+          <Price />
+        </Route>
+        <Route path={`/${coinId}/chart`}>
+          <Chart />
+        </Route>
+      </Switch>
     </Container>
   );
 }
