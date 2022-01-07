@@ -23,6 +23,7 @@ const Header = styled.header`
 
 const Title = styled.h1`
   font-size: 35px;
+  margin-bottom: 30px;
   color: ${(props) => props.theme.accentColor};
 `;
 
@@ -130,9 +131,14 @@ interface priceData {
   };
 }
 
-function Coin() {
+interface IDark {
+  isDark: boolean;
+}
+
+function Coin({ isDark }: IDark) {
   const { coinId } = useParams<coinIdProps>();
   const { state } = useLocation<RouteState>();
+  console.log(state);
   const priceMatch = useRouteMatch("/:coinId/price");
   const chartMatch = useRouteMatch("/:coinId/chart");
   const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
@@ -152,7 +158,9 @@ function Coin() {
         </title>
       </Helmet>
       <Header>
-        <Title>{state?.name || "Loading..."}</Title>
+        <Title>
+          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
+        </Title>
       </Header>
       {loading ? <Loader>Loading...</Loader> : null}
 
@@ -173,7 +181,7 @@ function Coin() {
           <Price />
         </Route>
         <Route path={`/${coinId}/chart`}>
-          <Chart coinId={coinId} />
+          <Chart isDark={isDark} coinId={coinId} />
         </Route>
       </Switch>
     </Container>

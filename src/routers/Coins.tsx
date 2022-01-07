@@ -22,7 +22,7 @@ const CoinsList = styled.ul``;
 
 const Coin = styled.li`
   background-color: white;
-  color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   margin-bottom: 10px;
   border-radius: 15px;
   a {
@@ -62,15 +62,20 @@ interface coinInterface {
   type: string;
 }
 
-function Coins() {
+interface ItoggleDark {
+  toggleDark: () => void;
+}
+
+function Coins({ toggleDark }: ItoggleDark) {
   const { isLoading, data } = useQuery<coinInterface[]>("allCoins", fetchCoins);
   return (
     <Container>
       <Helmet>
         <title>Coins</title>
-        </Helmet>
+      </Helmet>
       <Header>
         <Title>Coins</Title>
+        <button onClick={toggleDark}>Toggle</button>
       </Header>
       {isLoading ? (
         <Loader>Loading...</Loader>
