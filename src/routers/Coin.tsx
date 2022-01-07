@@ -7,24 +7,93 @@ import Price from "./Price";
 import { useQuery } from "react-query";
 import { fetchInfoData, fetchPriceData } from "../api";
 import { Helmet } from "react-helmet";
+import { fetchChartData } from "../api";
+import { number } from "yargs";
 
 const Container = styled.div`
   padding: 0 20px;
   max-width: 480px;
   margin: 0 auto; /* 센터로 옴. */
+  hr {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+`;
+
+const Navigator = styled.nav<{ isHeart: boolean }>`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 0;
+  button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: ${(props) => props.theme.textColor};
+  }
+  button:last-child {
+    color: ${(props) => (props.isHeart ? "#E44136" : "#7F7F87")};
+  }
 `;
 
 const Header = styled.header`
   height: 10vh;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  padding: 100px 0;
+`;
+
+const TitleHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 `;
 
 const Title = styled.h1`
   font-size: 35px;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
+  font-weight: 600;
   color: ${(props) => props.theme.accentColor};
+`;
+
+const TitlePrice = styled.span`
+  font-size: 35px;
+  font-weight: 600;
+  margin-bottom: 10px;
+`;
+
+const PercentageView = styled.div<{ isLoss: number }>`
+  display: flex;
+  align-items: center;
+  span {
+    margin-right: 10px;
+    color: ${(props) => props.theme.grayColor};
+  }
+  span:last-child {
+    color: ${(props) =>
+      props.isLoss > 0
+        ? "#E44136"
+        : props.isLoss == 0.0
+        ? "rgba(0, 0, 0, 0.5)"
+        : "#4880EE"};
+  }
+`;
+
+const Rank = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: skyblue;
+  padding: 10px 20px;
+  border-radius: 15px;
+  background-color: ${(props) => props.theme.rankColor};
+  span:first-child {
+    margin-bottom: 10px;
+  }
+  span:last-child {
+    font-size: 24px;
+    font-weight: bolder;
+  }
 `;
 
 const Loader = styled.span`
@@ -74,6 +143,10 @@ interface coinIdProps {
 
 interface RouteState {
   name: string;
+}
+
+interface HeartProps {
+  heart: boolean;
 }
 
 interface InfoData {
@@ -131,14 +204,23 @@ interface priceData {
   };
 }
 
-interface IDark {}
+interface IHistorical {
+  time_open: string;
+  time_close: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+  market_cap: number;
+}
 
-function Coin({}: IDark) {
+function Coin() {
   const { coinId } = useParams<coinIdProps>();
   const { state } = useLocation<RouteState>();
-  console.log(state);
   const priceMatch = useRouteMatch("/:coinId/price");
   const chartMatch = useRouteMatch("/:coinId/chart");
+  const [heart, setHeart] = useState(false);
   const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
     ["info", coinId],
     () => fetchInfoData(coinId)
@@ -147,6 +229,10 @@ function Coin({}: IDark) {
     ["tickers", coinId],
     () => fetchPriceData(coinId)
   );
+  const { isLoading, data } = useQuery<IHistorical[]>(["ohlcv", coinId], () =>
+    fetchChartData(coinId)
+  );
+  const clickHeart = () => setHeart((prev) => !prev);
   const loading = infoLoading || priceLoading;
   return (
     <Container>
@@ -154,11 +240,42 @@ function Coin({}: IDark) {
         <title>
           {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
         </title>
+        <script src="https://kit.fontawesome.com/6478f529f2.js"></script>
       </Helmet>
+      <Navigator isHeart={heart}>
+        <button>
+          <a href="/">
+            <i className="fas fa-chevron-left fa-2x"></i>
+          </a>
+        </button>
+        <button onClick={clickHeart}>
+          <i className="fas fa-heart fa-2x"></i>
+        </button>
+      </Navigator>
       <Header>
-        <Title>
-          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
-        </Title>
+        <TitleHeader>
+          <Title>
+            {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
+          </Title>
+          <TitlePrice>
+            ${priceData ? priceData?.quotes.USD.price.toFixed(2) : "Loading..."}
+          </TitlePrice>
+          <PercentageView
+            isLoss={priceData ? priceData?.quotes.USD.percent_change_7d : 0}
+          >
+            <span>1주일 전보다</span>
+            <span>
+              {priceData
+                ? priceData?.quotes.USD.percent_change_7d
+                : "Loading..."}
+              %
+            </span>
+          </PercentageView>
+        </TitleHeader>
+        <Rank>
+          <span>Rank</span>
+          <span>{infoData ? infoData?.rank : "???"}</span>
+        </Rank>
       </Header>
       {loading ? <Loader>Loading...</Loader> : null}
 
@@ -182,6 +299,7 @@ function Coin({}: IDark) {
           <Chart coinId={coinId} />
         </Route>
       </Switch>
+      <hr />
     </Container>
   );
 }
