@@ -131,11 +131,9 @@ interface priceData {
   };
 }
 
-interface IDark {
-  isDark: boolean;
-}
+interface IDark {}
 
-function Coin({ isDark }: IDark) {
+function Coin({}: IDark) {
   const { coinId } = useParams<coinIdProps>();
   const { state } = useLocation<RouteState>();
   console.log(state);
@@ -181,7 +179,7 @@ function Coin({ isDark }: IDark) {
           <Price />
         </Route>
         <Route path={`/${coinId}/chart`}>
-          <Chart isDark={isDark} coinId={coinId} />
+          <Chart coinId={coinId} />
         </Route>
       </Switch>
     </Container>
