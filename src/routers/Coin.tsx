@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useParams, useRouteMatch } from "react-router";
 import styled from "styled-components";
 import { Switch, Route, Link } from "react-router-dom";
@@ -8,7 +8,6 @@ import { useQuery } from "react-query";
 import { fetchInfoData, fetchPriceData } from "../api";
 import { Helmet } from "react-helmet";
 import { fetchChartData } from "../api";
-import { number } from "yargs";
 
 const Container = styled.div`
   padding: 0 20px;
@@ -87,6 +86,9 @@ const Rank = styled.div`
   padding: 10px 20px;
   border-radius: 15px;
   background-color: ${(props) => props.theme.rankColor};
+  span {
+    color: ${(props) => props.theme.bgColor};
+  }
   span:first-child {
     margin-bottom: 10px;
   }
@@ -137,6 +139,28 @@ const Tab = styled.div<{ isActive: boolean }>`
     props.isActive ? `5px solid ${props.theme.accentColor}` : "none"};
 `;
 
+const Duration = styled.div`
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-bottom: 20px;
+`;
+
+const DurationButton = styled.button`
+  background-color: transparent;
+  border: none;
+  color: ${(props) => props.theme.grayColor};
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 7px;
+
+  &:hover {
+    background-color: gray;
+    color: white;
+    padding: 4px 7px;
+    border-radius: 10px;
+  }
+`;
 interface coinIdProps {
   coinId: string;
 }
@@ -215,6 +239,12 @@ interface IHistorical {
   market_cap: number;
 }
 
+interface IDuration {
+  period: number;
+  kor: string;
+  api: number;
+}
+
 function Coin() {
   const { coinId } = useParams<coinIdProps>();
   const { state } = useLocation<RouteState>();
@@ -229,11 +259,49 @@ function Coin() {
     ["tickers", coinId],
     () => fetchPriceData(coinId)
   );
-  const { isLoading, data } = useQuery<IHistorical[]>(["ohlcv", coinId], () =>
-    fetchChartData(coinId)
-  );
+  console.log("1" + priceData);
+  const [duration, setDuration] = useState<IDuration>({
+    period: 1,
+    kor: "1주일",
+    api: priceData ? priceData?.quotes.USD.percent_change_7d : 0,
+  });
+  // const CHART_DURATION = [1, 2, 4, 12, 24]; // 1주일 2주일 1개월 3개월 1년
+  const CHART_DURATION = [
+    {
+      period: 1,
+      kor: "1주일",
+      api: priceData ? priceData?.quotes.USD.percent_change_7d : 0,
+    },
+    { period: 2, kor: "2주일", api: 0 },
+    {
+      period: 4,
+      kor: "1개월",
+      api: priceData ? priceData?.quotes.USD.percent_change_30d : 0,
+    },
+    { period: 12, kor: "3개월", api: 0 },
+    {
+      period: 48,
+      kor: "1년",
+      api: priceData ? priceData?.quotes.USD.percent_change_1y : 0,
+    },
+  ];
   const clickHeart = () => setHeart((prev) => !prev);
   const loading = infoLoading || priceLoading;
+  const clickOneWeek = () => {
+    setDuration(CHART_DURATION[0]);
+  };
+  const clickTwoWeek = () => {
+    setDuration(CHART_DURATION[1]);
+  };
+  const clickOneMonth = () => {
+    setDuration(CHART_DURATION[2]);
+  };
+  const clickThreeMonth = () => {
+    setDuration(CHART_DURATION[3]);
+  };
+  const clickSixMonth = () => {
+    setDuration(CHART_DURATION[4]);
+  };
   return (
     <Container>
       <Helmet>
@@ -260,14 +328,17 @@ function Coin() {
           <TitlePrice>
             ${priceData ? priceData?.quotes.USD.price.toFixed(2) : "Loading..."}
           </TitlePrice>
-          <PercentageView
-            isLoss={priceData ? priceData?.quotes.USD.percent_change_7d : 0}
-          >
-            <span>1주일 전보다</span>
+          <PercentageView isLoss={duration.api}>
+            <span>{duration.kor} 전보다</span>
             <span>
+              {/* {priceData
+                ? priceData?.quotes.USD.{duration.api !== "none" ? "df" : duration.api}
+                : "Loading..."} */}
               {priceData
-                ? priceData?.quotes.USD.percent_change_7d
-                : "Loading..."}
+                ? duration.api == 0
+                  ? "???"
+                  : duration.api
+                : "Loading"}
               %
             </span>
           </PercentageView>
@@ -296,9 +367,16 @@ function Coin() {
           <Price />
         </Route>
         <Route path={`/${coinId}/chart`}>
-          <Chart coinId={coinId} />
+          <Chart coinId={coinId} during={duration.period} />
         </Route>
       </Switch>
+      <Duration>
+        <DurationButton onClick={clickOneWeek}>1주일</DurationButton>
+        <DurationButton onClick={clickTwoWeek}>2주일</DurationButton>
+        <DurationButton onClick={clickOneMonth}>1개월</DurationButton>
+        <DurationButton onClick={clickThreeMonth}>3개월</DurationButton>
+        <DurationButton onClick={clickSixMonth}>1년</DurationButton>
+      </Duration>
       <hr />
     </Container>
   );

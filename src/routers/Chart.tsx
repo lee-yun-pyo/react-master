@@ -5,8 +5,9 @@ import ApexChart from "react-apexcharts";
 import { useRecoilValue } from "recoil";
 import { isDarkAtom } from "../atoms";
 
-interface ICoinId {
+interface IChart {
   coinId: string;
+  during: number;
 }
 
 interface IHistorical {
@@ -20,11 +21,18 @@ interface IHistorical {
   market_cap: number;
 }
 
-function Chart({ coinId }: ICoinId) {
+function Chart({ coinId, during }: IChart) {
   const isDark = useRecoilValue(isDarkAtom);
   const { isLoading, data } = useQuery<IHistorical[]>(["ohlcv", coinId], () =>
-    fetchChartData(coinId)
+    fetchChartData(coinId, during)
   );
+  console.log(
+    data
+      ? ((data[data.length - 1].close - data[0].close) / data[0].close) * 100
+      : "undefi"
+  );
+  console.log(data ? "오늘: " + data[data.length - 1].close : "undifie");
+  console.log(data ? "그때: " + data[0].close : "undo");
   return (
     <div>
       {isLoading ? (
