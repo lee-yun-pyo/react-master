@@ -7,11 +7,3 @@ export const darkTheme:DefaultTheme = {
     grayColor: "#7F7F87",
     rankColor: "#2C2C34",
 }
-
-export const lightTheme:DefaultTheme = {
-    bgColor: "whitesmoke",
-    textColor: "black",
-    accentColor: "#44bd32",
-    grayColor: "#7F7F87",
-    rankColor: "#2C2C34",
-}
