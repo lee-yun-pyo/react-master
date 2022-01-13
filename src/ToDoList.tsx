@@ -41,13 +41,16 @@ function ToDoList() {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm<IForm>({
     defaultValues: {
       email: "@naver.com",
     },
   });
-  const onVaild = (data: any) => {
-    console.log(data);
+  const onVaild = (data: IForm) => {
+    if (data.password !== data.password1) {
+      setError("password1", { message: "패스워드가 일치하지 않습니다." });
+    }
   };
   console.log(errors);
   return (
@@ -69,6 +72,12 @@ function ToDoList() {
           {...register("lastName", {
             required: "필수 입니다.",
             minLength: { value: 5, message: "to short" },
+            validate: {
+              react: (value) =>
+                value.includes("react") ? "react를 포함할 수 없습니다." : true,
+              js: (value) =>
+                value.includes("js") ? "js를 포함할 수 없습니다." : true,
+            },
           })}
           type="text"
           placeholder="write"
