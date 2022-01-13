@@ -28,30 +28,70 @@ import { useForm } from "react-hook-form";
 //   );
 // }
 
+interface IForm {
+  email: string;
+  lastName: string;
+  firstName: string;
+  password: string;
+  password1: string;
+}
+
 function ToDoList() {
-  const { register, handleSubmit, formState } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IForm>({
+    defaultValues: {
+      email: "@naver.com",
+    },
+  });
   const onVaild = (data: any) => {
     console.log(data);
   };
-  console.log(formState.errors);
+  console.log(errors);
   return (
     <div>
       <form onSubmit={handleSubmit(onVaild)}>
         <input
-          {...register("Email", { required: true })}
+          {...register("email", {
+            required: "필수 입니다.",
+            pattern: {
+              value: /^[A-Za-z0-9._%+-]+@naver.com$/,
+              message: "Only naver.com allowed",
+            },
+          })}
           type="text"
           placeholder="write"
         />
+        <span>{errors?.email?.message}</span>
         <input
-          {...register("Email2", {
+          {...register("lastName", {
+            required: "필수 입니다.",
             minLength: { value: 5, message: "to short" },
           })}
           type="text"
           placeholder="write"
         />
-        <input {...register("Email3")} type="text" placeholder="write" />
-        <input {...register("Email4")} type="text" placeholder="write" />
-        <input {...register("Email5")} type="text" placeholder="write" />
+        <span>{errors?.lastName?.message}</span>
+        <input
+          {...register("firstName", { required: "필수 입니다." })}
+          type="text"
+          placeholder="write"
+        />
+        <span>{errors?.firstName?.message}</span>
+        <input
+          {...register("password", { required: "필수 입니다." })}
+          type="text"
+          placeholder="write"
+        />{" "}
+        <span>{errors?.password?.message}</span>
+        <input
+          {...register("password1", { required: "필수 입니다." })}
+          type="text"
+          placeholder="write"
+        />{" "}
+        <span>{errors?.password1?.message}</span>
         <button>Click</button>
       </form>
     </div>
