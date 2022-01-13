@@ -29,16 +29,30 @@ import { useForm } from "react-hook-form";
 // }
 
 function ToDoList() {
-  const { register, watch } = useForm();
-  console.log(watch());
+  const { register, handleSubmit, formState } = useForm();
+  const onVaild = (data: any) => {
+    console.log(data);
+  };
+  console.log(formState.errors);
   return (
     <div>
-      <form>
-        <input {...register("Email")} type="text" placeholder="write" />
-        <input {...register("Email2")} type="text" placeholder="write" />
+      <form onSubmit={handleSubmit(onVaild)}>
+        <input
+          {...register("Email", { required: true })}
+          type="text"
+          placeholder="write"
+        />
+        <input
+          {...register("Email2", {
+            minLength: { value: 5, message: "to short" },
+          })}
+          type="text"
+          placeholder="write"
+        />
         <input {...register("Email3")} type="text" placeholder="write" />
         <input {...register("Email4")} type="text" placeholder="write" />
         <input {...register("Email5")} type="text" placeholder="write" />
+        <button>Click</button>
       </form>
     </div>
   );
