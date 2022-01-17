@@ -1,6 +1,6 @@
 import React from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { ITodo, toDoState } from "./atoms";
+import { Categories, ITodo, toDoState } from "./atoms";
 
 function ToDo({ text, category, id }: ITodo) {
   const setToDos = useSetRecoilState(toDoState);
@@ -22,18 +22,21 @@ function ToDo({ text, category, id }: ITodo) {
   return (
     <li>
       <span>{text}</span>
-      {category !== "TO_DO" && (
-        <button name="TO_DO" onClick={onClick}>
+      {category !== Categories.TO_DO && (
+        <button name={Categories.TO_DO} onClick={onClick}>
+          {/* name에 에러나는 이유: Categories.TO_DO는 number로 표현되므로 
+          string을 요하는 name에 number를 넣을 수 없다.
+          해결: 1) Categories.TO_DO + ""  2) enum을 string으로 초기화 */}
           To Do
         </button>
       )}
-      {category !== "DOING" && (
-        <button name="DOING" onClick={onClick}>
+      {category !== Categories.DOING && (
+        <button name={Categories.DOING} onClick={onClick}>
           Doing
         </button>
       )}
-      {category !== "DONE" && (
-        <button name="DONE" onClick={onClick}>
+      {category !== Categories.DONE && (
+        <button name={Categories.DONE} onClick={onClick}>
           Done
         </button>
       )}

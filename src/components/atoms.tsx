@@ -1,9 +1,16 @@
 import { atom, selector } from "recoil";
 
+export enum Categories {
+  "TO_DO" = "TO_DO",
+  "DOING" = "DOING",
+  "DONE" = "DONE",
+  // string으로 반환되도록 설정
+  // 원래 값: 0, 1, 2 (문자를 숫자로 표현함)
+}
 export interface ITodo {
   text: string;
   id: number;
-  category: "TO_DO" | "DOING" | "DONE";
+  category: Categories;
 }
 
 export const toDoState = atom<ITodo[]>({
@@ -11,9 +18,10 @@ export const toDoState = atom<ITodo[]>({
   default: [],
 });
 
-export const categoryState = atom({
+export const categoryState = atom<Categories>({
+  // <Categories>: 타입 스크립트에게 category가 세 개중 하나임을 알려줌
   key: "categoryState",
-  default: "TO_DO",
+  default: Categories.TO_DO,
 });
 
 export const toDoSelector = selector({
