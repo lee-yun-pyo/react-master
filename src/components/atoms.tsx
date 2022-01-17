@@ -24,16 +24,12 @@ export const categoryState = atom<Categories>({
   default: Categories.TO_DO,
 });
 
+/* toDo들 가져다가 categoryState에 맞는 toDo만을 걸러서 반환 */
 export const toDoSelector = selector({
   key: "toDoSelector",
   get: ({ get }) => {
     const toDos = get(toDoState);
     const category = get(categoryState);
-    if (category === "TO_DO")
-      return toDos.filter((toDo) => toDo.category === "TO_DO");
-    if (category === "DOING")
-      return toDos.filter((toDo) => toDo.category === "DOING");
-    if (category === "DONE")
-      return toDos.filter((toDo) => toDo.category === "DONE");
+    return toDos.filter((toDo) => toDo.category === category);
   },
 });
